@@ -67,7 +67,9 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.slf4j.Logger;
@@ -1002,6 +1004,10 @@ public class ElasticsearchTemplate implements ElasticsearchOperations, Applicati
 		if (query.getMinScore() > 0) {
 			searchRequestBuilder.setMinScore(query.getMinScore());
 		}
+
+		//force version to be fetched
+		searchRequestBuilder.setVersion(true);
+
 		return searchRequestBuilder;
 	}
 
@@ -1028,10 +1034,29 @@ public class ElasticsearchTemplate implements ElasticsearchOperations, Applicati
 			} else {
 				throw new ElasticsearchException("object or source is null, failed to index the document [id: " + query.getId() + "]");
 			}
-			if (query.getVersion() != null) {
-				indexRequestBuilder.setVersion(query.getVersion());
-				indexRequestBuilder.setVersionType(EXTERNAL);
-			}
+
+
+			try{
+			    //TCinc code
+			    Class clazz = Class.forName("com.translucentcomputing.tekstack.core.commons.domain.search.audit.AbstractAuditingExternalEntity");
+                //Entities that extend AbstractAuditingExternalEntity use external versioning
+                //Entities that extend AbstractAuditingInternalEntity use internal versioning
+                if (clazz.isAssignableFrom(query.getObject().getClass())) {
+                    if(query.getVersion() == null) throw new IllegalArgumentException("Version not set.");
+
+                    indexRequestBuilder.setVersion(query.getVersion());
+                    indexRequestBuilder.setVersionType(EXTERNAL);
+                } else {
+                    indexRequestBuilder.setVersionType(INTERNAL);
+                }
+            }catch (ClassNotFoundException e){
+			    //Original spring-data code
+			    if(query.getVersion() != null){
+                    indexRequestBuilder.setVersion(query.getVersion());
+                    indexRequestBuilder.setVersionType(EXTERNAL);
+                }
+            }
+
 
 			if (query.getParentId() != null) {
 				indexRequestBuilder.setParent(query.getParentId());

@@ -43,67 +43,7 @@ class CriteriaQueryProcessor {
 
 
 	QueryBuilder createQueryFromCriteria(Criteria criteria) {
-		if (criteria == null)
-			return null;
-
-		List<QueryBuilder> shouldQueryBuilderList = new LinkedList<QueryBuilder>();
-		List<QueryBuilder> mustNotQueryBuilderList = new LinkedList<QueryBuilder>();
-		List<QueryBuilder> mustQueryBuilderList = new LinkedList<QueryBuilder>();
-
-		ListIterator<Criteria> chainIterator = criteria.getCriteriaChain().listIterator();
-
-		QueryBuilder firstQuery = null;
-		boolean negateFirstQuery = false;
-
-		while (chainIterator.hasNext()) {
-			Criteria chainedCriteria = chainIterator.next();
-			QueryBuilder queryFragmentForCriteria = createQueryFragmentForCriteria(chainedCriteria);
-			if (queryFragmentForCriteria != null) {
-				if (firstQuery == null) {
-					firstQuery = queryFragmentForCriteria;
-					negateFirstQuery = chainedCriteria.isNegating();
-					continue;
-				}
-				if (chainedCriteria.isOr()) {
-					shouldQueryBuilderList.add(queryFragmentForCriteria);
-				} else if (chainedCriteria.isNegating()) {
-					mustNotQueryBuilderList.add(queryFragmentForCriteria);
-				} else {
-					mustQueryBuilderList.add(queryFragmentForCriteria);
-				}
-			}
-		}
-
-		if (firstQuery != null) {
-			if (!shouldQueryBuilderList.isEmpty() && mustNotQueryBuilderList.isEmpty() && mustQueryBuilderList.isEmpty()) {
-				shouldQueryBuilderList.add(0, firstQuery);
-			} else {
-				if (negateFirstQuery) {
-					mustNotQueryBuilderList.add(0, firstQuery);
-				} else {
-					mustQueryBuilderList.add(0, firstQuery);
-				}
-			}
-		}
-
-		BoolQueryBuilder query = null;
-
-		if (!shouldQueryBuilderList.isEmpty() || !mustNotQueryBuilderList.isEmpty() || !mustQueryBuilderList.isEmpty()) {
-
-			query = boolQuery();
-
-			for (QueryBuilder qb : shouldQueryBuilderList) {
-				query.should(qb);
-			}
-			for (QueryBuilder qb : mustNotQueryBuilderList) {
-				query.mustNot(qb);
-			}
-			for (QueryBuilder qb : mustQueryBuilderList) {
-				query.must(qb);
-			}
-		}
-
-		return query;
+		return new NestedCriteriaQueryProcessor().createQueryFromCriteria(criteria);
 	}
 
 

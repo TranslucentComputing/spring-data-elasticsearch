@@ -88,6 +88,7 @@ public class DefaultResultMapper extends AbstractResultMapper {
 					result = mapEntity(hit.getFields().values(), clazz);
 				}
 				setPersistentEntityId(result, hit.getId(), clazz);
+				setVersion(result, hit.getVersion(), clazz);
 				populateScriptFields(result, hit);
 				results.add(result);
 			}
@@ -154,6 +155,7 @@ public class DefaultResultMapper extends AbstractResultMapper {
 		T result = mapEntity(response.getSourceAsString(), clazz);
 		if (result != null) {
 			setPersistentEntityId(result, response.getId(), clazz);
+			setVersion(result, response.getVersion(), clazz);
 		}
 		return result;
 	}
@@ -165,6 +167,7 @@ public class DefaultResultMapper extends AbstractResultMapper {
 			if (!response.isFailed() && response.getResponse().isExists()) {
 				T result = mapEntity(response.getResponse().getSourceAsString(), clazz);
 				setPersistentEntityId(result, response.getResponse().getId(), clazz);
+				setVersion(result, response.getResponse().getVersion(), clazz);
 				list.add(result);
 			}
 		}
@@ -181,6 +184,19 @@ public class DefaultResultMapper extends AbstractResultMapper {
 			// Only deal with String because ES generated Ids are strings !
 			if (idProperty != null && idProperty.getType().isAssignableFrom(String.class)) {
 				persistentEntity.getPropertyAccessor(result).setProperty(idProperty, id);
+			}
+		}
+	}
+
+	private <T> void setVersion(T result, Long version, Class<T> clazz) {
+
+		if (mappingContext != null && clazz.isAnnotationPresent(Document.class)) {
+
+			ElasticsearchPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+			PersistentProperty<?> versionProperty = persistentEntity.getVersionProperty();
+
+			if (versionProperty != null && versionProperty.getType().isAssignableFrom(Long.class)) {
+				persistentEntity.getPropertyAccessor(result).setProperty(versionProperty, version);
 			}
 		}
 	}

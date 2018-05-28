@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.springframework.data</groupId>
-    <artifactId>spring-data-elasticsearch</artifactId>
-    <version>2.1.13.BUILD-SNAPSHOT</version>
+    <artifactId>tc-spring-data-elasticsearch</artifactId>
+    <version>Tyrion</version>
 
     <parent>
         <groupId>org.springframework.data.build</groupId>
@@ -17,15 +17,26 @@
     <description>Spring Data Implementation for Elasticsearch</description>
     <url>https://github.com/spring-projects/spring-data-elasticsearch</url>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>https://nexus.tekstackapps.com/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>https://nexus.tekstackapps.com/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
-
         <dist.key>DATAES</dist.key>
-
+        <source.level>1.8</source.level>
         <commonscollections>3.2.1</commonscollections>
         <commonslang>2.6</commonslang>
         <elasticsearch>2.4.0</elasticsearch>
         <springdata.commons>1.13.13.BUILD-SNAPSHOT</springdata.commons>
-
     </properties>
 
     <dependencies>
@@ -149,21 +160,6 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jfrog.buildinfo</groupId>
-                        <artifactId>artifactory-maven-plugin</artifactId>
-                        <inherited>false</inherited>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <developers>
         <developer>
             <id>biomedcentral</id>
@@ -186,13 +182,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <scm>
-        <url>https://github.com/spring-projects/spring-data-elasticsearch</url>
-        <connection>scm:git:git://github.com/spring-projects/spring-data-elasticsearch.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/spring-projects/spring-data-elasticsearch.git
-        </developerConnection>
-    </scm>
-
     <ciManagement>
         <system>Bamboo</system>
         <url>http://build.springsource.org/browse/SPRINGDATAES</url>
@@ -202,5 +191,4 @@
         <system>JIRA</system>
         <url>https://jira.springsource.org/browse/DATAES</url>
     </issueManagement>
-
 </project>
