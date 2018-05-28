@@ -1,7 +1,7 @@
 Spring Data Elasticsearch
 =========================
 
-Spring Data implementation for ElasticSearch
+Translucent Computing fork of Spring Data implementation for ElasticSearch
 
 Spring Data makes it easier to build Spring-powered applications that use new data access technologies such as non-relational databases, map-reduce frameworks, and cloud based data services as well as provide improved support for relational database technologies.
 
