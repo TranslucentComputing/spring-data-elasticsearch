@@ -1,7 +1,7 @@
 Spring Data Elasticsearch Changelog
 ===================================
 
-TCINC - Changes in version Tyrion (2018-05-28)
+TCINC - Changes in version 4.0.0-RELEASE (2018-05-28)
 ----------------------------------------
 * Added support for Nested Queries
 * Added support for internal versioned entities
